@@ -223,9 +223,16 @@ jobs:
       - name: Build TypeScript
         run: npm run build
 
-      - name: Clean up orphaned log groups (from any prior failed deploy)
+      - name: Clean up orphaned resources (from any prior failed deploy)
         run: |
           aws logs delete-log-group --log-group-name "/api/$SERVICE_NAME/production/access" --region us-east-1 2>/dev/null || true
+          # DynamoDB table is RETAINED on rollback — delete if empty before re-deploy
+          COUNT=$(aws dynamodb describe-table --table-name "$SERVICE_NAME-production-table" --region us-east-1 \
+            --query "Table.ItemCount" --output text 2>/dev/null || echo "NOT_FOUND")
+          if [ "$COUNT" = "0" ]; then
+            aws dynamodb delete-table --table-name "$SERVICE_NAME-production-table" --region us-east-1 2>/dev/null || true
+            aws dynamodb wait table-not-exists --table-name "$SERVICE_NAME-production-table" --region us-east-1 2>/dev/null || true
+          fi
         continue-on-error: true
 
       - name: Deploy to Production
