@@ -146,6 +146,11 @@ jobs:
       - name: Build TypeScript
         run: npm run build
 
+      - name: Clean up orphaned log groups (from any prior failed deploy)
+        run: |
+          aws logs delete-log-group --log-group-name "/api/$SERVICE_NAME/staging/access" --region us-east-1 2>/dev/null || true
+        continue-on-error: true
+
       - name: Deploy to Staging
         run: ENV=staging npx cdk deploy --require-approval never
 
