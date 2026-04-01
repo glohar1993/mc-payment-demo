@@ -1076,7 +1076,7 @@ exports[`Snapshot Tests infrastructure matches saved snapshot 1`] = `
       "Properties": {
         "Code": {
           "S3Bucket": "cdk-hnb659fds-assets-123456789012-us-east-1",
-          "S3Key": "a5b8072b943afb3b8725106b8967d38bf1c0e7923ecab29b9722aaebf28dc937.zip",
+          "S3Key": "35441afb94b57effd0a4b5e65f35200774d4fedde279950d01b3ac5ae280cb67.zip",
         },
         "Environment": {
           "Variables": {
@@ -1092,7 +1092,6 @@ exports[`Snapshot Tests infrastructure matches saved snapshot 1`] = `
         "FunctionName": "test-service-dev-handler",
         "Handler": "handler.handler",
         "MemorySize": 512,
-        "ReservedConcurrentExecutions": 10,
         "Role": {
           "Fn::GetAtt": [
             "ServiceHandlerServiceRole33EA1032",

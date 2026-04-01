@@ -109,7 +109,9 @@ export class ServiceStack extends cdk.Stack {
       functionName: `${serviceName}-${environment}-handler`,
       runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'handler.handler',
-      code: lambda.Code.fromAsset(path.join(__dirname, '../../dist/src')),
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../dist/src'), {
+        exclude: ['*.map', '*.d.ts', '*.d.ts.map'],
+      }),
       memorySize: 512,
       timeout: cdk.Duration.seconds(30),
 

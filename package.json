@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "test": "jest --coverage",
-    "test:unit": "jest --testPathPattern=test/",
+    "test:unit": "jest --testPathPattern=test/handler",
     "test:infra": "jest --testPathPattern=infra/test/",
     "lint": "eslint 'src/**/*.ts' 'infra/**/*.ts'",
     "cdk:synth": "npx cdk synth",
