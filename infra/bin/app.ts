@@ -47,6 +47,13 @@ new ServiceStack(app, `${serviceName}-${environment}`, {
   enableDynamoDB: true,
   enableMonitoring: environment !== 'dev', // Monitoring in staging + prod only
 
+  // Reserved concurrency: set via CDK_RESERVED_CONCURRENCY env var.
+  // At Mastercard scale this would be set per-environment in the pipeline.
+  // Unset here so sandbox accounts (low concurrency limits) work out-of-the-box.
+  reservedConcurrency: process.env.CDK_RESERVED_CONCURRENCY
+    ? parseInt(process.env.CDK_RESERVED_CONCURRENCY)
+    : undefined,
+
   // Standard tags (mandatory at Mastercard for cost tracking & compliance)
   tags: {
     Service: serviceName,

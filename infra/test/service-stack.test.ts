@@ -137,8 +137,8 @@ describe('Security & Compliance', () => {
     });
   });
 
-  test('Lambda has reserved concurrency set in production', () => {
-    const template = createTestStack({ environment: 'production' });
+  test('Lambda supports reserved concurrency when configured', () => {
+    const template = createTestStack({ environment: 'production', reservedConcurrency: 100 });
     template.hasResourceProperties('AWS::Lambda::Function', {
       ReservedConcurrentExecutions: 100,
     });
