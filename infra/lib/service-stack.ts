@@ -309,7 +309,7 @@ export class ServiceStack extends cdk.Stack {
         name: `${serviceName.substring(0, 15)}-${environment.substring(0, 3)}-canary`,
         executionRoleArn: canaryRole.roleArn,
         artifactS3Location: `s3://${canaryBucket.bucketName}`,
-        runtimeVersion: 'syn-nodejs-puppeteer-7.0',
+        runtimeVersion: 'syn-nodejs-puppeteer-15.0',
         schedule: {
           expression: 'rate(5 minutes)', // Run every 5 minutes
         },
