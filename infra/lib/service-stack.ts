@@ -34,6 +34,7 @@ import * as sns from 'aws-cdk-lib/aws-sns';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as synthetics from 'aws-cdk-lib/aws-synthetics';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as s3 from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 import * as path from 'path';
 
@@ -288,17 +289,26 @@ export class ServiceStack extends cdk.Stack {
       // It creates a Lambda that runs every 5 minutes, hits your API,
       // and alerts if anything is wrong — BEFORE real users notice.
 
+      // S3 bucket for canary artifacts (created by CDK, not pre-existing)
+      const canaryBucket = new s3.Bucket(this, 'CanaryArtifacts', {
+        bucketName: `${serviceName}-${environment}-canary-artifacts`,
+        removalPolicy: cdk.RemovalPolicy.DESTROY,
+        autoDeleteObjects: true,
+        lifecycleRules: [{ expiration: cdk.Duration.days(30) }],
+      });
+
       const canaryRole = new iam.Role(this, 'CanaryRole', {
         assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),
         managedPolicies: [
           iam.ManagedPolicy.fromAwsManagedPolicyName('CloudWatchSyntheticsFullAccess'),
         ],
       });
+      canaryBucket.grantReadWrite(canaryRole);
 
       new synthetics.CfnCanary(this, 'HealthCanary', {
         name: `${serviceName.substring(0, 15)}-${environment.substring(0, 3)}-canary`,
         executionRoleArn: canaryRole.roleArn,
-        artifactS3Location: `s3://${serviceName}-${environment}-canary-artifacts`,
+        artifactS3Location: `s3://${canaryBucket.bucketName}`,
         runtimeVersion: 'syn-nodejs-puppeteer-7.0',
         schedule: {
           expression: 'rate(5 minutes)', // Run every 5 minutes
