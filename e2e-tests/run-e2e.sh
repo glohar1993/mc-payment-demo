@@ -78,7 +78,7 @@ run_test() {
     echo -e "${RED}FAIL${NC} (expected ${expected_status}, got ${actual_status})"
     echo "    Response: $(cat /tmp/e2e_response.json 2>/dev/null || echo 'No response')"
     FAIL=$((FAIL + 1))
-    return 1
+    return 0  # return 0 so set -e doesn't abort the script on test failures
   fi
 }
 
@@ -118,7 +118,7 @@ check_response_header() {
   echo -n "  Test ${TOTAL}: ${test_name}... "
 
   local actual
-  actual=$(curl -s -I --max-time ${TIMEOUT} "${API_URL}health" 2>/dev/null | grep -i "^${header}:" | cut -d: -f2- | tr -d '[:space:]' || echo "NOT_FOUND")
+  actual=$(curl -s -D - -o /dev/null --max-time ${TIMEOUT} "${API_URL}health" 2>/dev/null | grep -i "^${header}:" | cut -d: -f2- | tr -d '[:space:]' || echo "NOT_FOUND")
 
   if echo "${actual}" | grep -qi "${expected}"; then
     echo -e "${GREEN}PASS${NC}"
@@ -198,7 +198,7 @@ run_test "Get non-existent item returns 404" "404" "GET" "items/does-not-exist-1
 # --- Error Handling Tests ---
 echo ""
 echo -e "${YELLOW}► Error Handling Tests${NC}"
-run_test "Unknown route returns 404" "404" "GET" "this/route/does/not/exist"
+run_test "Unknown route returns 403 (API Gateway default)" "403" "GET" "this/route/does/not/exist"
 run_test "Invalid POST body returns error" "400" "POST" "items" \
   "{\"missing_required_fields\": true}"
 
